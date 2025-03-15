@@ -1,14 +1,93 @@
-# publicengagementportal.github.io
-A public engagement platform for stakeholders to collect statistical data within a target region
+# React TypeScript DDD Template
 
-The Public Engagement Portal
+A modern React application template using TypeScript, following Domain-Driven Design (DDD) and Feature-Based Architecture principles.
 
-Broken Experience:
-Governments and Organizations collect statistical data to support projects, initiatives and various types of engagements with the public. A single yet multi-purpose tool for collecting statistical data from the public would be useful to these entities.
+## 🚀 Features
 
-Solution:
-The Public Engagement Portal is a platform that allows the public to directly provide relevant data to channels that is then analyzed and summarized then presented to both the public and stakeholders for taking action.
+- **Modern Stack**: React 18, TypeScript, Vite
+- **Architecture**: Domain-Driven Design (DDD) with Feature-Based Architecture
+- **State Management**: Zustand for efficient state management
+- **Routing**: React Router for client-side routing
+- **HTTP Client**: Axios with interceptors and error handling
+- **Testing**: Vitest for unit and integration testing
+- **Code Quality**: ESLint and TypeScript strict mode
 
-Example Use Case:
-Across communities in Jamaica a significant number of roadways are damaged and they go years without being repaired. Resources are normally allocated to repair roads annually by the parish councils however most times the areas that need the most work done aren’t actually addressed. The public engagement portal can be used to request statistical data from members of the public to help better identify areas across the island that require more resources pooled into road repairs than others. Users would submit posts to a channel dedicated to identifying damaged roads, their posts would then be analyzed and relevant data grouped and presented in charts and graphs and made exportable to portable formats. This information would also be useful for being forwarded to the relevant government body in helping to identify areas the public believes are in need of more road repairs.
+## 📁 Project Structure
 
+```
+src/
+│── features/                # Grouped by feature
+│   ├── featureA/
+│   │   ├── application/     # Application layer (use cases, services)
+│   │   ├── domain/         # Domain models, entities, value objects
+│   │   ├── infrastructure/ # API calls, persistence, external services
+│   │   ├── ui/            # React components specific to this feature
+│   │   ├── index.ts       # Public API - only export what's needed
+│── shared/                 # Cross-feature utilities and components
+│── app/                    # App initialization, providers, routing
+│── infrastructure/         # Global services (auth, API clients)
+│── config/                # Environment variables, constants
+│── tests/                 # Test utilities and integration tests
+```
+
+## 🛠 Setup
+
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Create a `.env` file based on `.env.example`
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+## 📝 Development Guidelines
+
+### Feature Development
+
+1. Create a new feature directory in `src/features/`
+2. Follow the layer separation:
+   - `domain/`: Business logic and models
+   - `application/`: Use cases and state management
+   - `infrastructure/`: External services integration
+   - `ui/`: React components
+3. Export only what's needed through `index.ts`
+
+### State Management
+
+- Use local state for UI-only state
+- Use Zustand stores for feature-level state
+- Avoid prop drilling (max 2 levels)
+
+### Code Quality
+
+- Run tests: `npm test`
+- Check linting: `npm run lint`
+- Build for production: `npm run build`
+
+## 🧪 Testing Strategy
+
+- Unit tests for domain logic
+- Integration tests for features
+- Component tests with React Testing Library
+- E2E tests (coming soon)
+
+## 📚 Documentation
+
+- Architecture decisions in `docs/architecture/`
+- Component documentation with JSDoc
+- API documentation (coming soon)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## 📄 License
+
+MIT
