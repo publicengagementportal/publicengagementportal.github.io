@@ -4,6 +4,9 @@ import { collection, query, orderBy, getDocs } from "firebase/firestore";
 import { useVisibilityStore } from "../../../features/shared/store/visibilityStore";
 import { db } from "../../../infrastructure/firebase";
 import type { DashboardStats } from "../domain/types";
+import { DashboardSummary } from "./components/DashboardSummary";
+import { SubmissionsBarChart } from "./components/SubmissionsBarChart";
+import { SubmissionsTable } from "./components/SubmissionsTable";
 
 interface Submission {
   id: string;
@@ -132,91 +135,30 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Data Summary Card */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4">Data Summary</h2>
-          <div className="space-y-4">
-            <div>
-              <p className="text-gray-600">Total Submissions</p>
-              <p className="text-2xl font-bold">{stats.totalSubmissions}</p>
-            </div>
-            <div>
-              <p className="text-gray-600">Latest Submission</p>
-              <p className="text-lg">
-                {stats.latestSubmission?.toLocaleDateString() || 'No submissions yet'}
-              </p>
-            </div>
-          </div>
-        </div>
+      {/* Summary Cards */}
+      <DashboardSummary 
+        totalSubmissions={stats.totalSubmissions}
+        latestSubmission={stats.latestSubmission}
+        submissionsByType={stats.submissionsByOption}
+      />
 
-        {/* Submissions by Asset Type */}
+      {/* Charts Section */}
+      <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-lg shadow">
           <h2 className="text-xl font-semibold mb-4">Submissions by Asset Type</h2>
-          <div className="space-y-2">
-            {Object.entries(stats.submissionsByOption).map(([option, count]) => (
-              <div key={option} className="flex justify-between items-center">
-                <span className="text-gray-600 capitalize">{option}</span>
-                <span className="font-semibold">{count}</span>
-              </div>
-            ))}
-          </div>
+          <SubmissionsBarChart data={stats.submissionsByOption} />
+        </div>
+        
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-semibold mb-4">Monthly Trend</h2>
+          {/* TODO: Add line chart for monthly trend */}
         </div>
       </div>
 
-      {/* Recent Submissions Table */}
-      <div className="mt-8 bg-white rounded-lg shadow overflow-hidden">
-        <h2 className="text-xl font-semibold p-6 border-b">Recent Submissions</h2>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Agency
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Asset
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Description
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Location
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Files
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {submissions.map((submission) => (
-                <tr key={submission.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {submission.timestamp?.toDate().toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {submission.data.agency.name}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {submission.data.asset.type}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    {submission.data.description}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    {submission.data.location || 'N/A'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {submission.files.length} file(s)
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      {/* Submissions Table */}
+      <div className="mt-8">
+        <h2 className="text-xl font-semibold mb-4">Recent Submissions</h2>
+        <SubmissionsTable data={submissions} />
       </div>
     </div>
   );
