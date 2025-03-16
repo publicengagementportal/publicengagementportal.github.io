@@ -7,6 +7,8 @@ import type { DashboardStats } from "../domain/types";
 import { DashboardSummary } from "./components/DashboardSummary";
 import { SubmissionsBarChart } from "./components/SubmissionsBarChart";
 import { SubmissionsTable } from "./components/SubmissionsTable";
+import { DataControls } from "./components/DataControls";
+import { FilterCriteria, filterSubmissions, processSubmissionsForExport, exportToCSV, downloadCSV } from "../application/dataProcessing";
 
 interface Submission {
   id: string;
@@ -34,7 +36,8 @@ interface PublicSettings {
 export default function DashboardPage() {
   const { userId } = useAuth();
   const { user } = useUser();
-  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [allSubmissions, setAllSubmissions] = useState<Submission[]>([]);
+  const [filteredSubmissions, setFilteredSubmissions] = useState<Submission[]>([]);
   const { isPublicDataEnabled, initialize } = useVisibilityStore();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -71,7 +74,8 @@ export default function DashboardPage() {
           ...doc.data()
         })) as Submission[];
 
-        setSubmissions(submissionsData);
+        setAllSubmissions(submissionsData);
+        setFilteredSubmissions(submissionsData);
         
         // Calculate stats
         const submissionsByOption = submissionsData.reduce((acc, submission) => {
@@ -92,13 +96,41 @@ export default function DashboardPage() {
       }
     };
 
-    // Only fetch if data is public or user is admin/org
-    if (isPublicDataEnabled || !isPublic) {
-      fetchData();
-    } else {
-      setIsLoading(false);
-    }
-  }, [isPublic, isPublicDataEnabled]);
+      // Only fetch if data is public or user is admin/org
+      if (isPublicDataEnabled || !isPublic) {
+        fetchData();
+      } else {
+        setIsLoading(false);
+      }
+    }, [isPublic, isPublicDataEnabled]);
+
+  const handleFilterChange = (filters: FilterCriteria) => {
+    const filtered = filterSubmissions(allSubmissions, filters);
+    setFilteredSubmissions(filtered);
+    
+    // Update stats for filtered data
+    const submissionsByOption = filtered.reduce((acc, submission) => {
+      const option = submission.data.asset.type;
+      acc[option] = (acc[option] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    setStats({
+      totalSubmissions: filtered.length,
+      latestSubmission: filtered[0]?.timestamp?.toDate(),
+      submissionsByOption,
+    });
+  };
+
+  const handleExport = () => {
+    const processedData = processSubmissionsForExport(filteredSubmissions);
+    const csv = exportToCSV(processedData);
+    downloadCSV(csv, `submissions-export-${new Date().toISOString().split('T')[0]}.csv`);
+  };
+
+  // Get unique asset and agency types for filters
+  const assetTypes = [...new Set(allSubmissions.map(s => s.data.asset.type))];
+  const agencyTypes = [...new Set(allSubmissions.map(s => s.data.agency.type))];
 
   if (isLoading) {
     return (
@@ -135,6 +167,14 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {/* Data Controls */}
+      <DataControls
+        onFilterChange={handleFilterChange}
+        onExport={handleExport}
+        assetTypes={assetTypes}
+        agencyTypes={agencyTypes}
+      />
+
       {/* Summary Cards */}
       <DashboardSummary 
         totalSubmissions={stats.totalSubmissions}
@@ -158,7 +198,7 @@ export default function DashboardPage() {
       {/* Submissions Table */}
       <div className="mt-8">
         <h2 className="text-xl font-semibold mb-4">Recent Submissions</h2>
-        <SubmissionsTable data={submissions} />
+        <SubmissionsTable data={filteredSubmissions} />
       </div>
     </div>
   );
