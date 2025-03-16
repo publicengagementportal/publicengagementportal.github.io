@@ -2,8 +2,8 @@ import { z } from 'zod'
 
 const envSchema = z.object({
   VITE_NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  VITE_API_URL: z.string().url(),
-  VITE_APP_VERSION: z.string(),
+  VITE_API_URL: z.string().url().optional(),
+  VITE_APP_VERSION: z.string().optional(),
   // Clerk config
   VITE_CLERK_PUBLISHABLE_KEY: z.string(),
   // Firebase config
