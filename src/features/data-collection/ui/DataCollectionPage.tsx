@@ -19,7 +19,7 @@ export default function DataCollectionPage() {
   });
   const [success, setSuccess] = useState(false);
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>({
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<FormData>({
     defaultValues: DEFAULT_FORM_DATA
   });
 
@@ -75,16 +75,41 @@ export default function DataCollectionPage() {
     localStorage.setItem(OFFLINE_STORAGE_KEY, JSON.stringify(offlineSubmissions));
   };
 
-  const validateFiles = (files: File[]) => {
-    if (!files || files.length === 0) return true;
+  const validateFiles = (value: File[] | undefined) => {
+    if (!value || !value.length) return true;
     
-    const invalidFiles = files.filter(file => file.size > MAX_FILE_SIZE);
+    const invalidFiles = value.filter(file => file.size > MAX_FILE_SIZE);
     
     if (invalidFiles.length > 0) {
       return `Files exceeding 5MB: ${invalidFiles.map(f => f.name).join(', ')}`;
     }
     
     return true;
+  };
+
+  const fileRef = register("files", {
+    validate: {
+      fileSize: validateFiles
+    }
+  });
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    fileRef.onChange(e); // Handle the default onChange
+    const files = e.target.files;
+    if (!files) return;
+    
+    // Convert FileList to File array and update form state
+    const fileArray = Array.from(files);
+    setValue("files", fileArray, { shouldValidate: true });
+    
+    // Update form data with selected files
+    setFormState(prev => ({
+      ...prev,
+      data: {
+        ...prev.data,
+        files: fileArray
+      }
+    }));
   };
 
   const onSubmit = async (data: FormData) => {
@@ -98,14 +123,22 @@ export default function DataCollectionPage() {
         return;
       }
 
-      // Upload files first
-      const fileUrls = await Promise.all(
-        Array.from(data.files).map(async (file) => {
-          const storageRef = ref(storage, `uploads/${userId}/${file.name}`);
+      // Upload files first if any are selected
+      const fileData = data.files?.length ? await Promise.all(
+        data.files.map(async (file) => {
+          const storagePath = `uploads/${userId}/${file.name}`;
+          const storageRef = ref(storage, storagePath);
           await uploadBytes(storageRef, file);
-          return getDownloadURL(storageRef);
+          const downloadUrl = await getDownloadURL(storageRef);
+          return {
+            name: file.name,
+            storagePath,
+            downloadUrl,
+            type: file.type,
+            size: file.size
+          };
         })
-      );
+      ) : [];
 
       // Add submission to Firestore
       await addDoc(collection(db, "submissions"), {
@@ -116,7 +149,15 @@ export default function DataCollectionPage() {
           description: data.description,
           location: data.location,
         },
-        files: fileUrls,
+        files: fileData.map(file => ({
+          name: file.name,
+          path: file.storagePath, // Make path more accessible at root level
+          url: file.downloadUrl,
+          metadata: {
+            type: file.type,
+            size: file.size
+          }
+        })),
         timestamp: new Date(),
       });
 
@@ -277,8 +318,11 @@ export default function DataCollectionPage() {
             type="file"
             multiple
             {...register("files", {
-              validate: validateFiles
+              validate: {
+                fileSize: validateFiles
+              }
             })}
+            onChange={handleFileChange}
             className="mt-1 block w-full text-sm text-gray-500
               file:mr-4 file:py-2 file:px-4
               file:rounded-md file:border-0
@@ -286,11 +330,24 @@ export default function DataCollectionPage() {
               file:bg-indigo-50 file:text-indigo-700
               hover:file:bg-indigo-100"
           />
-          {errors.files && (
-            <p className="mt-1 text-sm text-red-600">
-              {(errors.files as FieldError).message}
-            </p>
-          )}
+            {errors.files?.message && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.files.message}
+              </p>
+            )}
+            {formState.data.files.length > 0 && (
+              <div className="mt-2">
+                <p className="text-sm text-gray-600">Selected files:</p>
+                <ul className="mt-1 text-sm text-gray-500">
+                  {formState.data.files.map((file, index) => (
+                    <li key={index} className="flex items-center">
+                      <span className="truncate">{file.name}</span>
+                      <span className="ml-2 text-xs">({Math.round(file.size / 1024)}KB)</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
         </div>
 
         <button

@@ -39,7 +39,7 @@ export const DEFAULT_FORM_DATA: FormData = {
     details: '',
   },
   description: '',
-  files: [],
+  files: [] as File[],
 };
 
 export interface OfflineSubmission {
