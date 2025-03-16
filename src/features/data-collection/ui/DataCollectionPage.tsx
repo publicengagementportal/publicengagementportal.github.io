@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useForm, FieldError } from "react-hook-form";
 import { useAuth } from "@clerk/clerk-react";
+import { useNavigate } from "react-router-dom";
 import { addDoc, collection } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../../../infrastructure/firebase";
@@ -11,6 +12,7 @@ const OFFLINE_STORAGE_KEY = 'offlineSubmissions';
 
 export default function DataCollectionPage() {
   const { userId } = useAuth();
+  const navigate = useNavigate();
   const [formState, setFormState] = useState<FormState>({
     data: DEFAULT_FORM_DATA,
     isSubmitting: false,
@@ -52,6 +54,7 @@ export default function DataCollectionPage() {
     localStorage.setItem(OFFLINE_STORAGE_KEY, JSON.stringify(offlineSubmissions));
     setSuccess(true);
     reset();
+    navigate("/dashboard");
   };
 
   const syncOfflineSubmissions = async () => {
@@ -163,6 +166,7 @@ export default function DataCollectionPage() {
 
       setSuccess(true);
       reset();
+      navigate("/dashboard");
     } catch (err) {
       setFormState(prev => ({
         ...prev,
