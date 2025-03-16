@@ -1,52 +1,68 @@
-import { ArrowRight, Users, MessageSquare, Globe } from 'lucide-react';
-import { AuthButton } from '../../auth/ui/AuthButton';
+import { useAuth, SignInButton } from "@clerk/clerk-react";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
-export const LandingPage = () => {
+export function LandingPage() {
+  const { userId, isLoaded } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isLoaded && userId) {
+      // If user is logged in, redirect to dashboard
+      navigate("/dashboard");
+    }
+  }, [isLoaded, userId, navigate]);
+
+  // Don't render anything while checking auth status
+  if (!isLoaded) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
+
+  // If user is not logged in, show landing page
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
-        <div className="flex items-center space-x-2">
-          <Globe className="w-8 h-8 text-blue-600" />
-          <span className="text-xl font-bold text-gray-800">Public Engagement Portal</span>
-        </div>
-        <AuthButton />
-      </nav>
-
-      <main className="container mx-auto px-6 py-12">
-        <div className="text-center mb-16">
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            Connect. Engage. Impact.
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-16">
+        <div className="max-w-3xl mx-auto text-center">
+          <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl md:text-6xl">
+            Public Engagement Portal
           </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Join our community-driven platform where ideas transform into action. 
-            Engage in meaningful discussions and shape the future together.
+          <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg md:mt-5 md:text-xl">
+            Empowering communities through data-driven insights
           </p>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full inline-flex items-center space-x-2 transform transition hover:scale-105">
-            <span>Get Started</span>
-            <ArrowRight className="w-5 h-5" />
-          </button>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-8 mt-12">
-          <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition">
-            <Users className="w-12 h-12 text-blue-600 mb-4" />
-            <h3 className="text-xl font-semibold mb-2">Community Hubs</h3>
-            <p className="text-gray-600">Connect with like-minded individuals in specialized community hubs.</p>
+          <div className="mt-8">
+            <SignInButton mode="modal">
+              <button className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700">
+                Get Started
+              </button>
+            </SignInButton>
           </div>
           
-          <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition">
-            <MessageSquare className="w-12 h-12 text-blue-600 mb-4" />
-            <h3 className="text-xl font-semibold mb-2">Active Discussions</h3>
-            <p className="text-gray-600">Engage in meaningful conversations across various channels.</p>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition">
-            <Globe className="w-12 h-12 text-blue-600 mb-4" />
-            <h3 className="text-xl font-semibold mb-2">Global Impact</h3>
-            <p className="text-gray-600">Make a difference in your community and beyond.</p>
+          <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h3 className="text-lg font-medium text-gray-900">Data Collection</h3>
+              <p className="mt-2 text-gray-500">
+                Submit and manage data with our easy-to-use forms
+              </p>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h3 className="text-lg font-medium text-gray-900">Visualization</h3>
+              <p className="mt-2 text-gray-500">
+                View insights and trends through interactive dashboards
+              </p>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h3 className="text-lg font-medium text-gray-900">Collaboration</h3>
+              <p className="mt-2 text-gray-500">
+                Work together with organizations and community members
+              </p>
+            </div>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
-};
+}
