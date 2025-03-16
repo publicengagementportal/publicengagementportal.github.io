@@ -8,6 +8,7 @@ import { DashboardSummary } from "./components/DashboardSummary";
 import { SubmissionsBarChart } from "./components/SubmissionsBarChart";
 import { SubmissionsTable } from "./components/SubmissionsTable";
 import { DataControls } from "./components/DataControls";
+import { MonthlyTrendLineChart } from "./components/MonthlyTrendLineChart";
 import { FilterCriteria, filterSubmissions, processSubmissionsForExport, exportToCSV, downloadCSV } from "../application/dataProcessing";
 
 interface Submission {
@@ -191,7 +192,7 @@ export default function DashboardPage() {
         
         <div className="bg-white p-6 rounded-lg shadow">
           <h2 className="text-xl font-semibold mb-4">Monthly Trend</h2>
-          {/* TODO: Add line chart for monthly trend */}
+          <MonthlyTrendLineChart data={{ Jan: 10, Feb: 20, Mar: 15 }} />
         </div>
       </div>
 
