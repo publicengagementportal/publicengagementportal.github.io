@@ -24,4 +24,7 @@ export const db = getFirestore(app)
 export const storage = getStorage(app)
 export const realtime = getDatabase(app)
 
+// Export collections
+export * from './collections'
+
 export default app
