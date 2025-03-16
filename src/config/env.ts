@@ -4,6 +4,8 @@ const envSchema = z.object({
   VITE_NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   VITE_API_URL: z.string().url(),
   VITE_APP_VERSION: z.string(),
+  // Clerk config
+  VITE_CLERK_PUBLISHABLE_KEY: z.string(),
   // Firebase config
   VITE_FIREBASE_API_KEY: z.string(),
   VITE_FIREBASE_AUTH_DOMAIN: z.string(),
@@ -21,6 +23,8 @@ function validateEnv(): Env {
     VITE_NODE_ENV: import.meta.env.VITE_NODE_ENV,
     VITE_API_URL: import.meta.env.VITE_API_URL,
     VITE_APP_VERSION: import.meta.env.VITE_APP_VERSION,
+    // Clerk config
+    VITE_CLERK_PUBLISHABLE_KEY: import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
     // Firebase config
     VITE_FIREBASE_API_KEY: import.meta.env.VITE_FIREBASE_API_KEY,
     VITE_FIREBASE_AUTH_DOMAIN: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,

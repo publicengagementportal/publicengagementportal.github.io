@@ -19,11 +19,13 @@
     "@firebase/firestore": "^4.7.9",
     "@firebase/storage": "^0.13.7",
     "axios": "^1.8.1",
+    "clsx": "^2.1.1",
     "firebase": "^11.4.0",
     "lucide-react": "^0.344.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-router-dom": "6.22.1",
+    "tailwind-merge": "^3.0.2",
     "zod": "^3.22.4",
     "zustand": "4.5.1"
   },
