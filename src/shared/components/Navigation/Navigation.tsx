@@ -1,7 +1,13 @@
 import { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useUser, UserButton } from "@clerk/clerk-react";
+import { motion } from "framer-motion";
 import { useVisibilityStore } from "../../../features/shared/store/visibilityStore";
+import { motionVariants } from "../../../lib/motion";
+
+const MotionNav = motion.nav;
+const MotionLink = motion(Link);
+const MotionDiv = motion.div;
 
 export function Navigation() {
   const location = useLocation();
@@ -35,79 +41,115 @@ export function Navigation() {
 
   return (
     <>
-      <nav className="bg-white shadow fixed top-0 left-0 right-0 z-50">
-        <div className="container mx-auto px-4 relative">
+      <MotionNav 
+        className="fixed top-0 left-0 right-0 z-50 bg-[#1a2942]/90 backdrop-blur-md border-b border-[#4d5b8c]/30"
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ type: "spring", damping: 20, stiffness: 100 }}
+      >
+        <MotionDiv
+          className="container mx-auto px-4 relative"
+          variants={motionVariants.fadeIn}
+          initial="initial"
+          animate="animate"
+        >
           <div className="flex h-16 justify-between items-center">
             {/* Logo/Home Link */}
-            <Link to="/" className="flex items-center">
-              <span className="text-xl font-bold text-indigo-600">
+            <MotionLink
+              to="/"
+              className="flex items-center"
+              whileHover={motionVariants.hoverEnergize}
+            >
+              <span className="text-xl font-bold text-[#a8c6ff] tracking-wider font-display">
                 Public Engagement Portal
               </span>
-            </Link>
+            </MotionLink>
 
             {/* Navigation Links */}
             <div className="flex items-center">
               {/* Main Navigation */}
               <div className="flex items-center space-x-4 mr-6">
                 {navItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    location.pathname === item.path
-                      ? "bg-indigo-100 text-indigo-700"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                  }`}
-                >
-                  {item.label}
-                </Link>
+                  <MotionLink
+                    key={item.path}
+                    to={item.path}
+                    className={`px-3 py-2 rounded-sm text-sm font-medium tracking-wide transition-all duration-200 ${
+                      location.pathname === item.path
+                        ? "bg-[#2d3f59]/50 text-[#a8c6ff] shadow-[0_0_10px_rgba(168,198,255,0.1)]"
+                        : "text-[#8ba2cc] hover:text-[#a8c6ff] hover:bg-[#2d3f59]/30"
+                    }`}
+                    whileHover={motionVariants.hoverEnergize}
+                    variants={motionVariants.fadeIn}
+                  >
+                    {item.label}
+                  </MotionLink>
                 ))}
               </div>
 
               {/* Public Data Toggle & User Menu */}
-              <div className="flex items-center space-x-4 border-l pl-6">
+              <div className="flex items-center space-x-4 border-l border-[#4d5b8c]/30 pl-6">
                 {/* Data Visibility Toggle with role-based tooltip */}
                 <div className="flex items-center space-x-2">
-                  <button
+                  <motion.button
                     onClick={togglePublicVisibility}
                     className={`
-                      group
-                      relative inline-flex h-8 w-14 items-center rounded-full
-                      transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
+                      group relative inline-flex h-8 w-14 items-center rounded-sm
+                      transition-all duration-300 focus:outline-none
                       ${isPublicDataEnabled 
-                        ? 'bg-green-600 hover:bg-green-700'
-                        : 'bg-gray-200 hover:bg-gray-300'
+                        ? 'bg-[#2d3f59]/50 shadow-[0_0_10px_rgba(168,198,255,0.1)]'
+                        : 'bg-[#1a2942]/80'
                       }
-                      hover:bg-opacity-80
                     `}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.98 }}
                     title={`Click to make data ${isPublicDataEnabled ? 'private' : 'public'}`}
                   >
-                    <span
+                    <motion.span
                       className={`
+                        inline-block h-6 w-6 transform rounded-sm bg-[#8ba2cc] shadow-lg transition-transform
                         ${isPublicDataEnabled ? 'translate-x-7' : 'translate-x-1'}
-                        inline-block h-6 w-6 transform rounded-full bg-white shadow-lg transition-transform
                       `}
+                      layout
+                      transition={{
+                        type: "spring",
+                        stiffness: 500,
+                        damping: 30
+                      }}
                     />
-                  </button>
-                  <span className={`text-sm font-medium ${isPublicDataEnabled ? 'text-green-600' : 'text-gray-500'}`}>
+                  </motion.button>
+                  <span className={`text-sm font-medium ${
+                    isPublicDataEnabled ? 'text-[#a8c6ff]' : 'text-[#8ba2cc]'
+                  }`}>
                     {isPublicDataEnabled ? 'Public' : 'Private'}
                   </span>
                 </div>
-                <UserButton afterSignOutUrl="/" />
+                <UserButton 
+                  afterSignOutUrl="/"
+                  appearance={{
+                    elements: {
+                      avatarBox: "hover:shadow-[0_0_10px_rgba(168,198,255,0.2)] transition-shadow duration-200"
+                    }
+                  }}
+                />
               </div>
             </div>
           </div>
           
           {/* Error Message */}
           {error && (
-            <div className="absolute top-full left-0 right-0 mt-1">
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mx-4 text-sm">
+            <motion.div 
+              className="absolute top-full left-0 right-0 mt-1"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+            >
+              <div className="bg-red-900/20 border border-red-500/20 text-red-300/90 px-4 py-2 rounded-sm mx-4 text-sm backdrop-blur-sm">
                 {error}
               </div>
-            </div>
+            </motion.div>
           )}
-        </div>
-      </nav>
+        </MotionDiv>
+      </MotionNav>
       <div className="h-16" /> {/* Spacer for fixed navbar */}
     </>
   );

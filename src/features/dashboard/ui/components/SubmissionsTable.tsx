@@ -8,7 +8,14 @@ import {
   getPaginationRowModel,
 } from '@tanstack/react-table';
 import { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
+import { motionVariants } from '@/lib/motion';
+
+const MotionTh = motion.th;
+const MotionTr = motion.tr;
+const MotionTd = motion.td;
 
 interface Submission {
   id: string;
@@ -68,6 +75,8 @@ const columns = [
   }),
 ];
 
+const PaginationButton = motion.button;
+
 export const SubmissionsTable = ({ data }: SubmissionsTableProps) => {
   const [sorting, setSorting] = useState<SortingState>([]);
 
@@ -84,19 +93,32 @@ export const SubmissionsTable = ({ data }: SubmissionsTableProps) => {
   });
 
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
+    <motion.div
+      className="rounded-sm border border-[#4d5b8c]/30 overflow-hidden backdrop-blur-md bg-[#1a2942]/90"
+      variants={motionVariants.fadeIn}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+    >
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+        <table className="min-w-full divide-y divide-[#4d5b8c]/20">
+          <thead>
             {table.getHeaderGroups().map(headerGroup => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map(header => (
-                  <th
+                  <MotionTh
                     key={header.id}
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer select-none"
+                    className="px-6 py-4 text-left text-xs font-medium text-[#a8c6ff] uppercase tracking-wider cursor-pointer select-none bg-[#2d3f59]/30"
                     onClick={header.column.getToggleSortingHandler()}
+                    whileHover={{
+                      backgroundColor: "rgba(77, 91, 140, 0.3)",
+                      transition: { duration: 0.2 }
+                    }}
                   >
-                    <div className="flex items-center gap-2">
+                    <motion.div 
+                      className="flex items-center gap-2"
+                      whileHover={motionVariants.hoverEnergize}
+                    >
                       {flexRender(
                         header.column.columnDef.header,
                         header.getContext()
@@ -106,81 +128,125 @@ export const SubmissionsTable = ({ data }: SubmissionsTableProps) => {
                       ) : header.column.getIsSorted() === 'desc' ? (
                         <ChevronDown className="h-4 w-4" />
                       ) : null}
-                    </div>
-                  </th>
+                    </motion.div>
+                  </MotionTh>
                 ))}
               </tr>
             ))}
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {table.getRowModel().rows.map(row => (
-              <tr key={row.id}>
-                {row.getVisibleCells().map(cell => (
-                  <td
-                    key={cell.id}
-                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))}
+          <tbody className="divide-y divide-[#4d5b8c]/20">
+            <AnimatePresence>
+              {table.getRowModel().rows.map(row => (
+                <MotionTr
+                  key={row.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                  whileHover={{
+                    backgroundColor: "rgba(45, 63, 89, 0.3)",
+                    transition: { duration: 0.2 }
+                  }}
+                >
+                  {row.getVisibleCells().map(cell => (
+                    <MotionTd
+                      key={cell.id}
+                      className="px-6 py-4 whitespace-nowrap text-sm text-[#8ba2cc]"
+                    >
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </MotionTd>
+                  ))}
+                </MotionTr>
+              ))}
+            </AnimatePresence>
           </tbody>
         </table>
       </div>
       
       {/* Pagination Controls */}
-      <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+      <div className="flex items-center justify-between border-t border-[#4d5b8c]/20 px-4 py-3 sm:px-6">
         <div className="flex flex-1 justify-between sm:hidden">
-          <button
+          <PaginationButton
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
-            className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className={cn(
+              "relative inline-flex items-center rounded-sm px-4 py-2 text-sm",
+              "border border-[#4d5b8c]/30 bg-[#2d3f59]/30 text-[#8ba2cc]",
+              "transition-all duration-200",
+              "disabled:opacity-50 disabled:cursor-not-allowed",
+              "hover:border-[#8ba2cc]/30 hover:text-[#a8c6ff] hover:shadow-[0_0_10px_rgba(168,198,255,0.05)]"
+            )}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
           >
             Previous
-          </button>
-          <button
+          </PaginationButton>
+          <PaginationButton
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
-            className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className={cn(
+              "relative inline-flex items-center rounded-sm px-4 py-2 text-sm ml-3",
+              "border border-[#4d5b8c]/30 bg-[#2d3f59]/30 text-[#8ba2cc]",
+              "transition-all duration-200",
+              "disabled:opacity-50 disabled:cursor-not-allowed",
+              "hover:border-[#8ba2cc]/30 hover:text-[#a8c6ff] hover:shadow-[0_0_10px_rgba(168,198,255,0.05)]"
+            )}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
           >
             Next
-          </button>
+          </PaginationButton>
         </div>
         <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm text-gray-700">
+            <p className="text-sm text-[#8ba2cc]">
               Showing{' '}
-              <span className="font-medium">{table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}</span>{' '}
+              <span className="font-medium text-[#a8c6ff]">{table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}</span>{' '}
               to{' '}
-              <span className="font-medium">
+              <span className="font-medium text-[#a8c6ff]">
                 {Math.min((table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize, data.length)}
               </span>{' '}
               of{' '}
-              <span className="font-medium">{data.length}</span>{' '}
+              <span className="font-medium text-[#a8c6ff]">{data.length}</span>{' '}
               results
             </p>
           </div>
-          <div>
-            <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-              <button
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-                className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-              >
-                Previous
-              </button>
-              <button
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-                className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-              >
-                Next
-              </button>
-            </nav>
+          <div className="flex gap-2">
+            <PaginationButton
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+              className={cn(
+                "relative inline-flex items-center gap-1 rounded-sm px-3 py-2 text-sm",
+                "border border-[#4d5b8c]/30 bg-[#2d3f59]/30 text-[#8ba2cc]",
+                "transition-all duration-200",
+                "disabled:opacity-50 disabled:cursor-not-allowed",
+                "hover:border-[#8ba2cc]/30 hover:text-[#a8c6ff] hover:shadow-[0_0_10px_rgba(168,198,255,0.05)]"
+              )}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Previous
+            </PaginationButton>
+            <PaginationButton
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+              className={cn(
+                "relative inline-flex items-center gap-1 rounded-sm px-3 py-2 text-sm",
+                "border border-[#4d5b8c]/30 bg-[#2d3f59]/30 text-[#8ba2cc]",
+                "transition-all duration-200",
+                "disabled:opacity-50 disabled:cursor-not-allowed",
+                "hover:border-[#8ba2cc]/30 hover:text-[#a8c6ff] hover:shadow-[0_0_10px_rgba(168,198,255,0.05)]"
+              )}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              Next
+              <ChevronRight className="h-4 w-4" />
+            </PaginationButton>
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
