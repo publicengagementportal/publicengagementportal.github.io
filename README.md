@@ -1,93 +1,57 @@
-# React TypeScript DDD Template
+# Public Engagement Portal
 
-A modern React application template using TypeScript, following Domain-Driven Design (DDD) and Feature-Based Architecture principles.
+A community-driven platform built with React, TypeScript, and DDD architecture.
 
-## 🚀 Features
+## Features
 
-- **Modern Stack**: React 18, TypeScript, Vite
-- **Architecture**: Domain-Driven Design (DDD) with Feature-Based Architecture
-- **State Management**: Zustand for efficient state management
-- **Routing**: React Router for client-side routing
-- **HTTP Client**: Axios with interceptors and error handling
-- **Testing**: Vitest for unit and integration testing
-- **Code Quality**: ESLint and TypeScript strict mode
+- Landing page with modern UI
+- Authentication with Clerk
+- Protected routes
+- Tailwind CSS for styling
 
-## 📁 Project Structure
+## Setup Instructions
+
+1. Install dependencies:
+```bash
+npm install
+```
+
+2. Create a Clerk account and get your API keys:
+- Go to [Clerk Dashboard](https://dashboard.clerk.dev)
+- Create a new application
+- Copy your Publishable Key and Secret Key
+
+3. Set up environment variables:
+- Create a `.env` file in the root directory
+- Add your Clerk keys:
+```
+VITE_CLERK_PUBLISHABLE_KEY=your_publishable_key_here
+VITE_CLERK_SECRET_KEY=your_secret_key_here
+```
+
+4. Start the development server:
+```bash
+npm run dev
+```
+
+## Project Structure
+
+Following Domain-Driven Design (DDD) architecture:
 
 ```
 src/
-│── features/                # Grouped by feature
-│   ├── featureA/
-│   │   ├── application/     # Application layer (use cases, services)
-│   │   ├── domain/         # Domain models, entities, value objects
-│   │   ├── infrastructure/ # API calls, persistence, external services
-│   │   ├── ui/            # React components specific to this feature
-│   │   ├── index.ts       # Public API - only export what's needed
-│── shared/                 # Cross-feature utilities and components
-│── app/                    # App initialization, providers, routing
-│── infrastructure/         # Global services (auth, API clients)
-│── config/                # Environment variables, constants
-│── tests/                 # Test utilities and integration tests
+├── features/           # Feature-based modules
+│   ├── auth/          # Authentication feature
+│   └── landingPage/   # Landing page feature
+├── middleware/        # Auth middleware
+├── shared/           # Shared components
+└── app/              # App configuration
 ```
 
-## 🛠 Setup
+## Tech Stack
 
-1. Clone the repository
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Create a `.env` file based on `.env.example`
-4. Start the development server:
-   ```bash
-   npm run dev
-   ```
-
-## 📝 Development Guidelines
-
-### Feature Development
-
-1. Create a new feature directory in `src/features/`
-2. Follow the layer separation:
-   - `domain/`: Business logic and models
-   - `application/`: Use cases and state management
-   - `infrastructure/`: External services integration
-   - `ui/`: React components
-3. Export only what's needed through `index.ts`
-
-### State Management
-
-- Use local state for UI-only state
-- Use Zustand stores for feature-level state
-- Avoid prop drilling (max 2 levels)
-
-### Code Quality
-
-- Run tests: `npm test`
-- Check linting: `npm run lint`
-- Build for production: `npm run build`
-
-## 🧪 Testing Strategy
-
-- Unit tests for domain logic
-- Integration tests for features
-- Component tests with React Testing Library
-- E2E tests (coming soon)
-
-## 📚 Documentation
-
-- Architecture decisions in `docs/architecture/`
-- Component documentation with JSDoc
-- API documentation (coming soon)
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
-## 📄 License
-
-MIT
+- React + TypeScript
+- Clerk Authentication
+- Tailwind CSS
+- React Router DOM
+- Zustand for state management
