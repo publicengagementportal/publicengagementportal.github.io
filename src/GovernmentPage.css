@@ -1,0 +1,11 @@
+/* ...existing code... */
+.vertical-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Adjust spacing between tiles as needed */
+}
+
+.government-tile {
+  /* Add any additional styling for the tiles here */
+  width: 100%; /* Make tiles stretch to full width if needed */
+}
